@@ -17,6 +17,18 @@ Python + Flask + OpenCV 的局域网实时监视项目。树莓派从手机 HTTP
 5. **安装人员模型**：运行下载脚本；模型会校验 SHA-256，不使用人员检测时模型加载失败也不会阻止视频和动作检测。
 6. **启动并使用**：运行 `app.py`，用手机或电脑浏览器打开 `http://树莓派IP:8000`。
 
+### Windows 一键部署（setup.bat / run.bat）
+
+在 Windows 电脑上运行本项目（例如用旧笔记本做监视主机），无需手动敲命令：
+
+1. 安装 Python 3.10+（[python.org](https://www.python.org/downloads/)），安装时**勾选 "Add python.exe to PATH"**。
+2. 获取项目：`git clone https://github.com/Jokersareme/camera_monitor_kimi.git`，或直接下载 ZIP 解压。
+3. 双击 **setup.bat**：自动删除旧 `.venv`、用本机 Python 重建虚拟环境、从清华镜像安装全部依赖（镜像失败自动回退官方源）。换电脑后只需重跑这一步。
+4. 复制 `config.example.json` 为 `config.json`，把 `cameras` 里的地址改成你的手机 IP 摄像头地址（如 `http://手机IP:8080/video`）。
+5. 双击 **run.bat** 启动服务，浏览器打开 `http://127.0.0.1:8000`（局域网内其他设备用电脑 IP 访问）。
+
+> 提示：`.venv` 不能在电脑之间直接拷贝（内含绝对路径），跨机器移植一律重跑 setup.bat。
+
 ### 第一步：复制哪些文件
 
 可以复制整个目录后排除上述运行产物。必须保留这些内容：
@@ -24,6 +36,8 @@ Python + Flask + OpenCV 的局域网实时监视项目。树莓派从手机 HTTP
 ```text
 camera_monitor/
 ├── app.py                       # 总入口：启动所有后台线程和网页服务
+├── setup.bat                    # Windows 一键配置环境（双击运行）
+├── run.bat                      # Windows 一键启动服务（双击运行）
 ├── config.example.json          # 配置模板，不含真实账号或令牌
 ├── requirements.txt             # Python 依赖清单
 ├── README.md                    # 本文档
