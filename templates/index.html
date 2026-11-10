@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>婴儿睡眠监视</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<main>
+  <header><h1>婴儿睡眠监视</h1><p>辅助提醒工具，不能代替成人看护</p></header>
+  <section class="panel camera-picker">
+    <label for="camera-select">选择摄像头</label>
+    <select id="camera-select" disabled><option value="">正在读取摄像头列表</option></select>
+    <small id="camera-hint">只会显示实际视频源的画面</small>
+  </section>
+  <section class="video-wrap">
+    <img id="camera-feed" src="/video.mjpeg" alt="实时视频；未配置或摄像头离线时不会显示实时画面">
+    <span id="camera-badge" class="badge">连接中</span>
+  </section>
+  <div id="motion-alert" class="motion-alert" role="alert" aria-live="assertive" aria-atomic="true" hidden>
+    <strong>检测到持续明显活动</strong>
+    <span id="motion-alert-time"></span>
+    <small>请查看实时画面并确认宝宝状态</small>
+  </div>
+  <div id="error" role="alert"></div>
+  <section class="status-grid">
+    <div><span>摄像头</span><strong id="camera-status">连接中</strong></div>
+    <div><span>检测人数</span><strong id="person-count">—</strong></div>
+    <div><span>人员检测</span><strong id="detection-status">加载中</strong></div>
+    <div><span>画面帧率</span><strong id="fps">—</strong></div>
+  </section>
+  <section class="panel">
+    <label class="switch-row"><span>动作告警<small>只提醒持续明显动作，不代表宝宝已醒来</small></span><input id="motion-toggle" type="checkbox" role="switch"></label>
+    <label class="switch-row"><span>人员方框<small>关闭后暂停推理，不影响画面与动作检测</small></span><input id="person-toggle" type="checkbox" role="switch"></label>
+    <label class="switch-row debug"><span>显示 ROI 调试框</span><input id="debug-toggle" type="checkbox" role="switch"></label>
+  </section>
+  <section class="panel">
+    <div class="panel-title-row">
+      <h2>检测设置</h2>
+      <button id="detection-settings-toggle" type="button" class="secondary">展开 ▾</button>
+    </div>
+    <div id="detection-settings" hidden>
+      <div id="motion-params"></div>
+      <p id="motion-params-status" class="muted"></p>
+      <p class="muted">调整立即生效并保存到服务器，重启后保留；数值越小越灵敏、越容易触发。</p>
+    </div>
+  </section>
+  <section class="panel">
+    <h2>网页活动提醒</h2>
+    <div class="alert-settings">
+      <label for="motion-alert-mode">提醒方式
+        <select id="motion-alert-mode">
+          <option value="sound">声音</option>
+          <option value="vibrate">震动</option>
+          <option value="both">声音和震动</option>
+          <option value="popup">仅弹窗</option>
+        </select>
+      </label>
+      <label for="motion-alert-sound-seconds">声音时长
+        <select id="motion-alert-sound-seconds">
+          <option value="1">1 秒</option>
+          <option value="3">3 秒</option>
+          <option value="5">5 秒</option>
+          <option value="10" selected>10 秒</option>
+          <option value="20">20 秒</option>
+          <option value="30">30 秒</option>
+        </select>
+      </label>
+      <label for="motion-alert-vibrate-seconds">震动时长
+        <select id="motion-alert-vibrate-seconds">
+          <option value="1">1 秒</option>
+          <option value="3">3 秒</option>
+          <option value="5">5 秒</option>
+          <option value="10" selected>10 秒</option>
+          <option value="20">20 秒</option>
+          <option value="30">30 秒</option>
+        </select>
+      </label>
+      <button id="test-motion-alert" type="button">测试网页提醒</button>
+    </div>
+    <p id="alert-capability" class="muted">正在检查浏览器提醒能力</p>
+    <p class="muted alert-help">声音和震动时长可在此调节（每 0.8 秒重复一次提醒直到设定时长），只保存在当前浏览器；弹窗固定保留 10 秒。动作告警关闭或临时静音时不提醒。</p>
+  </section>
+  <section class="panel">
+    <h2>临时静音</h2>
+    <div class="buttons"><button data-minutes="5">5 分钟</button><button data-minutes="15">15 分钟</button><button data-minutes="30">30 分钟</button><button data-minutes="0" class="secondary">取消静音</button></div>
+    <p id="mute-status">未静音</p>
+  </section>
+  <section class="panel details">
+    <p>运动状态：<strong id="motion-status">—</strong></p>
+    <p>最近动作：<time id="last-motion">暂无</time></p>
+    <p>最近通知：<time id="last-notification">暂无</time></p>
+    <p>最近设备异常：<time id="last-device">暂无</time></p>
+    <p>人员结果更新：<time id="detection-updated">暂无</time></p>
+    <p class="muted">检测结果可能漏报或误报；系统不能监测呼吸、窒息或其他医疗状况。</p>
+  </section>
+  <button id="test-notify" class="secondary">发送文字测试通知</button>
+</main>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

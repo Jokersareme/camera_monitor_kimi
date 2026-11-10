@@ -1,0 +1,21 @@
+[Unit]
+Description=Local LAN baby monitor
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/camera_monitor
+Environment=MONITOR_CONFIG=/home/pi/camera_monitor/config.json
+ExecStart=/home/pi/camera_monitor/.venv/bin/python /home/pi/camera_monitor/app.py
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/home/pi/camera_monitor/data
+
+[Install]
+WantedBy=multi-user.target

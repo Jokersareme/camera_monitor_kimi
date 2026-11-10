@@ -1,0 +1,64 @@
+{
+  "server": {"host": "0.0.0.0", "port": 8000},
+  "cameras": [
+    {
+      "id": "phone-1",
+      "name": "婴儿房手机",
+      "source": "phone",
+      "url": "http://192.168.1.100:8080/video"
+    }
+  ],
+  "selected_camera": "phone-1",
+  "camera": {
+    "source": "phone",
+    "url": "http://192.168.1.100:8080/video",
+    "device": 0,
+    "width": 640,
+    "height": 480,
+    "fps": 10,
+    "reconnect_delay_seconds": 2.0,
+    "open_timeout_ms": 5000,
+    "read_timeout_ms": 5000,
+    "jpeg_quality": 75
+  },
+  "motion": {
+    "roi": [0.1, 0.1, 0.8, 0.8],
+    "process_width": 160,
+    "sensitivity": 25,
+    "min_area_ratio": 0.025,
+    "min_motion_intensity": 12.0,
+    "sustained_seconds": 2.0,
+    "window_seconds": 4.0,
+    "min_active_ratio": 0.5,
+    "cooldown_seconds": 60.0,
+    "background_rate": 0.03,
+    "lighting_delta_threshold": 18.0,
+    "freeze_seconds": 5.0
+  },
+  "detection": {
+    "model_path": "models/yolox_nano.onnx",
+    "input_size": 416,
+    "confidence_threshold": 0.35,
+    "nms_threshold": 0.45,
+    "interval_seconds": 1.0,
+    "stale_seconds": 3.0
+  },
+  "notifications": {
+    "provider": "ntfy",
+    "ntfy_server": "https://ntfy.sh",
+    "ntfy_topic": "replace-with-a-long-random-private-topic",
+    "bark_server": "https://api.day.app",
+    "bark_device_key": "",
+    "timeout_seconds": 5.0,
+    "retries": 2,
+    "retry_delay_seconds": 2.0,
+    "offline_enabled": true,
+    "offline_threshold_seconds": 30.0,
+    "offline_cooldown_seconds": 300.0
+  },
+  "storage": {
+    "state_file": "data/state.json",
+    "events_file": "data/events.jsonl",
+    "max_events": 1000
+  }
+}
