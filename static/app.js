@@ -41,6 +41,7 @@ function showError(message) {
 }
 async function api(path, options) {
   const response = await fetch(path, {cache: "no-store", ...options});
+  if (response.status === 401) { window.location.href = "/login"; throw new Error("未登录"); }
   const body = await response.json();
   if (!response.ok) throw new Error(body.error || "请求失败");
   return body;

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>登录 - 婴儿睡眠监视</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<main>
+  <header><h1>婴儿睡眠监视</h1><p>请先登录后继续</p></header>
+  <section class="panel">
+    <form method="post" class="login-form">
+      <label>账号
+        <input name="username" autocomplete="username" required autofocus>
+      </label>
+      <label>密码
+        <input name="password" type="password" autocomplete="current-password" required>
+      </label>
+      {% if error %}<p id="error" class="visible">{{ error }}</p>{% endif %}
+      <button type="submit">登录</button>
+    </form>
+  </section>
+</main>
+</body>
+</html>

@@ -29,6 +29,16 @@ Python + Flask + OpenCV 的局域网实时监视项目。树莓派从手机 HTTP
 
 > 提示：`.venv` 不能在电脑之间直接拷贝（内含绝对路径），跨机器移植一律重跑 setup.bat。
 
+### 访问登录（账号密码）
+
+在 `config.json` 的 `auth` 段填写账号密码即可开启登录保护（`username` 或 `password` 为空则关闭登录、直接开放访问）：
+
+```json
+"auth": {"username": "admin", "password": "你的密码"}
+```
+
+开启后所有页面、视频流和 API 都需要先登录；登录页在 `/login`，主页面底部有"退出登录"。密码也可以存 SHA-256 哈希而不是明文：运行 `tools/set_password.py` 交互式设置（推荐），它会自动把哈希写入 `config.json`。修改账号密码后需要重启服务生效，已登录的会话会自动失效。
+
 ### 第一步：复制哪些文件
 
 可以复制整个目录后排除上述运行产物。必须保留这些内容：
@@ -50,12 +60,14 @@ camera_monitor/
 │   ├── state.py                 # 开关、静音持久化和事件记录
 │   └── server.py                # Flask 页面、MJPEG 和 API
 ├── templates/
-│   └── index.html               # 手机友好的监视页面
+│   ├── index.html               # 手机友好的监视页面
+│   └── login.html               # 账号密码登录页
 ├── static/
 │   ├── app.js                   # 状态刷新、页面控制和网页活动提醒
-│   └── style.css                # 页面及 10 秒提醒浮层样式
+│   └── style.css                # 页面、登录页及提醒浮层样式
 ├── tools/
 │   ├── download_model.py        # 下载、校验并检查人员模型
+│   ├── set_password.py          # 交互式设置登录账号密码（SHA-256 存储）
 │   ├── simulate_stream.py       # 无手机时生成本地模拟 MJPEG 流
 │   └── benchmark.py             # FPS、推理耗时、CPU/内存基准
 ├── deploy/

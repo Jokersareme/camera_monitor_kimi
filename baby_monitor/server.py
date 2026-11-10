@@ -1,9 +1,12 @@
+import hashlib
+import hmac
+import os
 import threading
 import time
 
 import cv2
 import numpy as np
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 
 from .state import StateStore
 
@@ -73,6 +76,57 @@ def create_app(camera, config, motion=None, detector=None, notifier=None, offlin
         response.headers["Referrer-Policy"] = "no-referrer"
         response.headers["Cache-Control"] = "no-store"
         return response
+
+    # ---------- 账号密码登录 ----------
+    auth_cfg = config.get("auth") or {}
+    auth_user = str(auth_cfg.get("username") or "").strip()
+    auth_secret = str(auth_cfg.get("password") or auth_cfg.get("password_sha256") or "")
+
+    def _check_auth(username, password):
+        if not auth_user or not auth_secret:
+            return True
+        if not hmac.compare_digest(str(username).encode("utf-8"), auth_user.encode("utf-8")):
+            return False
+        if auth_secret.startswith("sha256:"):
+            digest = hashlib.sha256(str(password).encode("utf-8")).hexdigest()
+            return hmac.compare_digest(digest, auth_secret[7:])
+        return hmac.compare_digest(str(password).encode("utf-8"), auth_secret.encode("utf-8"))
+
+    # 密钥由账号密码派生：重启后会话保持有效；改密码后旧会话自动失效
+    app.secret_key = hashlib.sha256(f"{auth_user}:{auth_secret}".encode("utf-8")).hexdigest() if auth_user and auth_secret else os.urandom(32).hex()
+
+    @app.before_request
+    def require_login():
+        if not auth_user or not auth_secret:
+            return None
+        if session.get("auth_user") == auth_user:
+            return None
+        if request.endpoint in ("login", "static"):
+            return None
+        if request.path.startswith("/api/"):
+            return jsonify({"error": "未登录"}), 401
+        return redirect(url_for("login"))
+
+    @app.route("/login", methods=("GET", "POST"))
+    def login():
+        if not auth_user or not auth_secret:
+            return redirect(url_for("index"))
+        error = ""
+        if request.method == "POST":
+            username = request.form.get("username", "")
+            password = request.form.get("password", "")
+            if _check_auth(username, password):
+                session.clear()
+                session["auth_user"] = auth_user
+                return redirect(url_for("index"))
+            time.sleep(1.0)
+            error = "账号或密码错误"
+        return render_template("login.html", error=error)
+
+    @app.get("/logout")
+    def logout():
+        session.clear()
+        return redirect(url_for("login"))
 
     @app.get("/")
     def index():
